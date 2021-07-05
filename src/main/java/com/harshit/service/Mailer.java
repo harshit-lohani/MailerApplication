@@ -1,0 +1,114 @@
+package com.harshit.service;
+import javax.mail.*;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+
+
+import java.util.Properties;
+
+
+public class Mailer {
+    private String userEmail;
+    private String password;
+    private String recipient;
+    private String subject;
+    private String body;
+
+    private static final String HOSTNAME = "mail.smtp.host";
+    private static final String SOCKETFACTORYPORT = "mail.smtp.socketFactoryPort";
+    private static final String SOCKETFACTORYCLASS = "mail.smtp.socketFactory.class";
+    private static final String AUTHENTICATION = "mail.smtp.auth";
+    private static final String PORTNUMBER = "mail.smtp.port";
+
+    
+    public Mailer(String userEmail, String password, String recipient, String subject, String body) {
+        this.userEmail = userEmail;
+        this.password = password;
+        this.recipient = recipient;
+        this.subject = subject;
+        this.body = body;
+    }
+    
+
+
+    /* This function takes hostname, port number, socket class and authentication bool
+    to create an object of Properties class and returns the same.
+    */
+    Properties createProperty(String hostname, String portNumber, String authentication, String socketClass){
+        Properties prop = new Properties();
+        prop.put(HOSTNAME, hostname);
+        prop.put(PORTNUMBER, portNumber);
+        prop.put(SOCKETFACTORYCLASS, socketClass);
+        prop.put(SOCKETFACTORYPORT, portNumber);
+        prop.put(AUTHENTICATION, authentication);
+        return prop;
+    }
+
+
+    /* This function takes sender's email ID as String, password as String and SMTP properties as a Properties object
+    and returns the default instance of the Session object with those parameters.
+    */
+    Session createSession(final String userEmail, final String userPassword, Properties prop){
+        Session session = Session.getDefaultInstance(prop,
+                new javax.mail.Authenticator(){
+                    protected PasswordAuthentication getPasswordAuthentication(){
+                        return new PasswordAuthentication(userEmail, userPassword);
+                    }
+                });
+
+        return session;
+    }
+
+
+
+    /*
+    This function takes a Session object, from address, to address, subject and body and returns an
+    object of class Message. The function checks for valid email format and throws a Messaging Exception if email
+    is not valid, or subject or body is null or not string
+     */
+    Message createMessage(Session session, String from, String to, String subjectText, String body) throws MessagingException {
+
+        Message message = new MimeMessage(session);
+        message.setFrom(new InternetAddress(from));
+        message.setRecipient(Message.RecipientType.TO, new InternetAddress(to));
+        message.setSubject(subjectText);
+        message.setText(body);
+
+        return message;
+    }
+
+
+
+    /*
+    This function takes an object of class Message and tries to send the mail through the described properties in
+    the Message object. The function throws a Messaging Exception if Message object is NULL or of wrong format.
+     */
+    void sendMessage(Message message) throws MessagingException {
+        Transport.send(message);
+    }
+
+
+    public boolean callMailer(){
+
+        //local variables to initialize SMTP Properties object
+        final String hostname = "smtp.gmail.com";
+        final String portNumber = "465";
+        final String checkAuthentication = "true";
+        final String socketClass = "javax.net.ssl.SSLSocketFactory";
+
+
+        Properties prop = this.createProperty(hostname, portNumber, checkAuthentication, socketClass);    //creates a Properties object with SMTP parameters
+        Session session = this.createSession(this.userEmail, this.password, prop);    //create session using object's email id and password
+        Message message;    //create an object of Message class
+
+        try {
+            message = this.createMessage(session, this.userEmail, this.recipient, this.subject, this.body);   //composes the message
+            this.sendMessage(message);    //tries to send the message using the message's properties
+            return true;
+        } catch (Exception e) {
+            System.out.println("Invalid email or password!");
+            e.printStackTrace();
+            return false;
+        }
+    }
+}
