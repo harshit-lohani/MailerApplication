@@ -9,12 +9,13 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+
 
 import com.harshit.beans.Credentials;
 import com.harshit.beans.Mail;
 import com.harshit.beans.User;
 import com.harshit.dao.UserDao;
+import com.harshit.service.Mailer;
 
 @Controller
 public class UserController {
@@ -22,7 +23,7 @@ public class UserController {
 	
 	@Autowired
 	private UserDao dao;			//will inject dao from xml file
-	
+	private Credentials userCred = null;
 	
 	/*
 	 *It displays a form to input data, "command" here is
@@ -51,9 +52,10 @@ public class UserController {
 		
 		User user = dao.validateCredentials(cred);
 
-		if (user != null)
+		if (user != null) {
+			this.userCred = cred;
 			return "homepage";
-
+		}
 		else {
 			return "failure";
 		}
@@ -66,11 +68,19 @@ public class UserController {
 	}
 	
 	@RequestMapping(value = "mailProcess", method = RequestMethod.POST)
-	public String mailerProcess(@ModelAttribute("mail") Mail mail, @ModelAttribute("user")User user) {
+	public String mailerProcess(@ModelAttribute("mail") Mail mail) {
 		System.out.println("Mail: "+ mail.getBody());
-		System.out.println("User: " + user.getEmail());
+		System.out.println("User: " + userCred.getUserEmail());
 //		System.out.println("Credentials: " + cred.getUserEmail());
-		return "success";
+		
+		Mailer mailer = new Mailer(mail, userCred);
+		
+		boolean sent = mailer.callMailer();
+		
+		if(sent)
+			return "success";
+		else
+			return "failure";
 	}
 	
 	
@@ -110,6 +120,12 @@ public class UserController {
 		return "redirect:/veiwUser";
 	}
 	
+	
+	@RequestMapping("/signout")
+	public String signout() {
+		this.userCred = null;
+		return "loginForm";
+	}
 	
 	
 	

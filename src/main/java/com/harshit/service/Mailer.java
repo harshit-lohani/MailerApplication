@@ -3,6 +3,8 @@ import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
+import com.harshit.beans.Credentials;
+import com.harshit.beans.Mail;
 
 import java.util.Properties;
 
@@ -29,6 +31,21 @@ public class Mailer {
         this.body = body;
     }
     
+    
+    public Mailer(Mail mail, Credentials cred) {
+        this.userEmail = cred.getUserEmail();
+        this.password = cred.getPassword();
+        this.recipient = mail.getToEmail();
+        this.subject = mail.getSubject();
+        this.body = mail.getBody();
+        
+        System.out.println(this.userEmail);
+        System.out.println(this.password);
+        System.out.println(this.recipient);
+        System.out.println(this.subject);
+        System.out.println(this.body);
+        
+    }
 
 
     /* This function takes hostname, port number, socket class and authentication bool

@@ -17,7 +17,7 @@
 			<table>
 				<tr>
 					<td>Recipient's Email :</td>
-					<td> <input type = "text" name = "recipient"> </td>
+					<td> <input type = "text" name = "toEmail"> </td>
 				</tr>
 				<tr>
 					<td>Subject : </td>

@@ -5,7 +5,6 @@ public class Mail {
 	private String subject;
 	private String body;
 	
-	
 	public String getToEmail() {
 		return toEmail;
 	}
