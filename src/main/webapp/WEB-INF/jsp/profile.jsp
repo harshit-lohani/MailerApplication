@@ -1,8 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
 	pageEncoding="ISO-8859-1" isELIgnored="false"%>
+
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -21,11 +21,11 @@
 			</div>
 
 			<ul class="nav navbar-nav navbar-right">
-				<li class="active"><a href="showHomepage">Home</a></li>
+				<li><a href="showHomepage">Home</a></li>
 				<li><a href="showInbox">Inbox</a></li>
 				<li><a href="showMailer">Send Mail</a></li>
 				<li><a href="showLogs">Show Logs</a></li>
-				<li><a href="showProfile">Profile</a></li>
+				<li class="active"><a href="showProfile">Profile</a></li>
 				<c:if test="${ isAdmin }">
 					<li><a href="viewUser">ViewUsers</a></li>
 				</c:if>
@@ -33,11 +33,46 @@
 			</ul>
 		</div>
 	</nav>
-
+	
+	
 	<div class="container">
-		<h3>Send Mails Using Mailer Application for free!</h3>
-		<p>The UI is beautiful thanks to Bootstrap CSS 3!</p>
+		<div class="row">
+			<div class="col-sm-2">
+				<b>Name</b>
+			</div>
+			<div class="col-sm-10">${userModel.getFirstName()}
+				${userModel.getLastName()}</div>
+		</div>
+
+		<div class="row">
+			<div class="col-sm-2">
+				<b>Phone Number</b>
+			</div>
+			<div class="col-sm-10">${userModel.getPhoneNumber()}</div>
+		</div>
+
+		<div class="row">
+			<div class="col-sm-2">
+				<b>Gender</b>
+			</div>
+			<div class="col-sm-10">${userModel.getGender()}</div>
+		</div>
+
+		<div class="row">
+			<div class="col-sm-2">
+				<b>Email</b>
+			</div>
+			<div class="col-sm-10">${credModel.getUserEmail()}</div>
+		</div>
+
+		<div class="row">
+			<div class="col-sm-2">
+				<b>isAdmin</b>
+			</div>
+			<div class="col-sm-10">${isAdmin}</div>
+		</div>
 	</div>
+
 
 </body>
 </html>

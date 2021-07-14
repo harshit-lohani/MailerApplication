@@ -1,16 +1,34 @@
 package com.harshit.beans;
 
 
+/*POJO class to store the user information which is retrieved from the the database
+ * and register jsp page. The name of variables match the name of path in the form in
+ * register page. Any changes to path name must be made here too.
+ */
+
+
 public class User {
 	private int id;
 	private String firstName;
 	private String lastName;
 	private String gender;
 	private String phoneNumber;
-	private String email;
-	private String password;
+	private String email;						//user's Gmail address
+	private String password;					//user's Gmail password encrypted by blowfish
+	private String role;
 	
 	
+	
+	
+	
+	public String getRole() {
+		return role;
+	}
+
+	public void setRole(String role) {
+		this.role = role;
+	}
+
 	public String getFirstName() {
 		return firstName;
 	}

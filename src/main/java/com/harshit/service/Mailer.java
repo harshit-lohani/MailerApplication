@@ -10,9 +10,12 @@ import java.util.Properties;
 
 
 public class Mailer {
-    private String userEmail;
+
+	private String userEmail;
     private String password;
     private String recipient;
+    private String bccEmail;
+    private String ccEmail;
     private String subject;
     private String body;
 
@@ -23,7 +26,7 @@ public class Mailer {
     private static final String PORTNUMBER = "mail.smtp.port";
 
     
-    public Mailer(String userEmail, String password, String recipient, String subject, String body) {
+    public Mailer(String userEmail, String password, String recipient, String subject, String body, String bcc, String cc) {
         this.userEmail = userEmail;
         this.password = password;
         this.recipient = recipient;
@@ -38,13 +41,8 @@ public class Mailer {
         this.recipient = mail.getToEmail();
         this.subject = mail.getSubject();
         this.body = mail.getBody();
-        
-        System.out.println(this.userEmail);
-        System.out.println(this.password);
-        System.out.println(this.recipient);
-        System.out.println(this.subject);
-        System.out.println(this.body);
-        
+        this.bccEmail= mail.getBccEmail();
+        this.ccEmail = mail.getCcEmail();        
     }
 
 
@@ -66,7 +64,7 @@ public class Mailer {
     and returns the default instance of the Session object with those parameters.
     */
     Session createSession(final String userEmail, final String userPassword, Properties prop){
-        Session session = Session.getDefaultInstance(prop,
+        Session session = Session.getInstance(prop,
                 new javax.mail.Authenticator(){
                     protected PasswordAuthentication getPasswordAuthentication(){
                         return new PasswordAuthentication(userEmail, userPassword);
@@ -83,14 +81,37 @@ public class Mailer {
     object of class Message. The function checks for valid email format and throws a Messaging Exception if email
     is not valid, or subject or body is null or not string
      */
-    Message createMessage(Session session, String from, String to, String subjectText, String body) throws MessagingException {
+    Message createMessage(Session session, String from, String toEmail, String subjectText, String body, String bccEmail, String ccEmail) throws MessagingException {
 
         Message message = new MimeMessage(session);
         message.setFrom(new InternetAddress(from));
-        message.setRecipient(Message.RecipientType.TO, new InternetAddress(to));
+        message.setRecipient(Message.RecipientType.TO, new InternetAddress(toEmail));
+        if(bccEmail != "" && bccEmail != null)
+        	message.setRecipient(Message.RecipientType.BCC, new InternetAddress(bccEmail));
+        if(ccEmail != "" && ccEmail != null)
+        	message.setRecipient(Message.RecipientType.CC, new InternetAddress(ccEmail));
         message.setSubject(subjectText);
         message.setText(body);
+        return message;
+    }
+    
+    
+    public Message getMessage() {
+    	
+        final String hostname = "smtp.gmail.com";
+        final String portNumber = "465";
+        final String checkAuthentication = "true";
+        final String socketClass = "javax.net.ssl.SSLSocketFactory";
+    	
+    	Properties prop = this.createProperty(hostname, portNumber, checkAuthentication, socketClass);    //creates a Properties object with SMTP parameters
+        Session session = this.createSession(this.userEmail, this.password, prop);    //create session using object's email id and password
+        Message message = null;    //create an object of Message class
 
+        try {
+			message = this.createMessage(session, this.userEmail, this.recipient, this.subject, this.body, this.bccEmail, this.ccEmail);
+		} catch (MessagingException e) {
+			e.printStackTrace();
+		}
         return message;
     }
 
@@ -119,7 +140,7 @@ public class Mailer {
         Message message;    //create an object of Message class
 
         try {
-            message = this.createMessage(session, this.userEmail, this.recipient, this.subject, this.body);   //composes the message
+            message = this.createMessage(session, this.userEmail, this.recipient, this.subject, this.body, this.bccEmail, this.ccEmail);   //composes the message
             this.sendMessage(message);    //tries to send the message using the message's properties
             return true;
         } catch (Exception e) {

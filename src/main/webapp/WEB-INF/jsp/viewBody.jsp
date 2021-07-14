@@ -6,7 +6,7 @@
 <html>
 <head>
 <meta charset="ISO-8859-1">
-<title>New Mail - Mailer Application</title>
+<title>Show Mail</title>
 <link
 	href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css"
 	rel="stylesheet" id="bootstrap-css">
@@ -22,8 +22,8 @@
 			<ul class="nav navbar-nav navbar-right">
 				<li><a href="showHomepage">Home</a></li>
 				<li><a href="showInbox">Inbox</a></li>
-				<li class="active"><a href="showMailer">Send Mail</a></li>
-				<li><a href="showLogs">Show Logs</a></li>
+				<li><a href="showMailer">Send Mail</a></li>
+				<li class="active"><a href="showLogs">Show Logs</a></li>
 				<li><a href="showProfile">Profile</a></li>
 				<c:if test="${ isAdmin }">
 					<li><a href="viewUser">ViewUsers</a></li>
@@ -36,43 +36,40 @@
 
 	<div class="container">
 		<h1>Compose your Mail</h1>
-		<form action="mailProcess" method="post">
+		<form>
 			<div class="form-group">
 				<label for="toEmail">Recipient's Email :</label> <input type="email"
-					class="form-control" id="toEmail" placeholder="Enter Email"
-					name="toEmail">
+					class="form-control" id="toEmail" name="toEmail"
+					value="${mailLog.toEmail}" disabled>
 			</div>
-			
+
 			<div class="form-group">
 				<label for="ccEmail">CC :</label> <input type="email"
-					class="form-control" id="ccEmail" placeholder="Enter Email"
-					name="ccEmail">
+					class="form-control" id="ccEmail" placeholder="Null" name="ccEmail"
+					disabled>
 			</div>
-			
+
 			<div class="form-group">
 				<label for="bccEmail">bcc :</label> <input type="email"
-					class="form-control" id="bccEmail" placeholder="Enter Email"
-					name="bccEmail">
+					class="form-control" id="bccEmail" placeholder="Null"
+					name="bccEmail" disabled>
 			</div>
 
 			<div class="form-group">
 				<label for="subject">Subject :</label> <input type="text"
-					class="form-control" id="subject" placeholder="Enter Subject"
-					name="subject">
+					class="form-control" id="subject" placeholder="No Subject"
+					value="${ mailLog.subject }" name="subject" disabled>
 			</div>
 			<div class="form-group">
 				<label for="body">Body :</label>
-				<textarea class="form-control form-control" rows="10" id="body" placeholder="Enter Body"
-					name="body"></textarea>
+				<textarea class="form-control form-control" rows="10" id="body"
+					placeholder="No Body" name="body" disabled>${ mailLog.body }</textarea>
 			</div>
-			
-			<input type='submit' class="btn btn-default">
-			
+
+			<a href="<c:url value='/showLogs'/>" class = "btn btn-default">Close</a>
 		</form>
 
 		<br>
-
-		<h3>${ message }</h3>
 	</div>
 </body>
 </html>
