@@ -36,19 +36,19 @@
 
 	<div class="container">
 		<h1>Compose your Mail</h1>
-		<form action="mailProcess" method="post">
+		<form action="mailProcess" method="post" enctype="multipart/form-data">
 			<div class="form-group">
 				<label for="toEmail">Recipient's Email :</label> <input type="email"
 					class="form-control" id="toEmail" placeholder="Enter Email"
 					name="toEmail">
 			</div>
-			
+
 			<div class="form-group">
 				<label for="ccEmail">CC :</label> <input type="email"
 					class="form-control" id="ccEmail" placeholder="Enter Email"
 					name="ccEmail">
 			</div>
-			
+
 			<div class="form-group">
 				<label for="bccEmail">bcc :</label> <input type="email"
 					class="form-control" id="bccEmail" placeholder="Enter Email"
@@ -62,12 +62,16 @@
 			</div>
 			<div class="form-group">
 				<label for="body">Body :</label>
-				<textarea class="form-control form-control" rows="10" id="body" placeholder="Enter Body"
-					name="body"></textarea>
+				<textarea class="form-control form-control" rows="10" id="body"
+					placeholder="Enter Body" name="body"></textarea>
 			</div>
-			
+			<div class="form-group">
+				<label for="attach">Add File :</label> <input type="file"
+					class="form-control" id="attachFile" name="attachFile">
+			</div>
+
 			<input type='submit' class="btn btn-default">
-			
+
 		</form>
 
 		<br>

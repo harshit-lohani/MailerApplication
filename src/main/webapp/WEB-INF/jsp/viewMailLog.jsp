@@ -63,7 +63,7 @@
 						<td>${ maillog.sendTime }</td>
 						<td>${ maillog.status }</td>
 						<td><a href="<c:url value='/edit/${maillog.id}'/>">Show</a></td>
-						<td><a href="<c:url value='/deleteLog/${maillog.id}'/>">Delete</a></td>
+						<td><a href="<c:url value='/deleteLog/${maillog.id}'/>" onclick="return confirm('Are you sure you want to delete?')">Delete</a></td>
 					</tr>
 				</c:forEach>
 			</tbody>

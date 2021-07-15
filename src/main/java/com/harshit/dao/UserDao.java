@@ -87,7 +87,6 @@ public class UserDao {
 
 		User user = list.get(0);
 		String cryptedPassword = CryptoService.encrypt(cred.getPassword());
-		System.out.println("correct hash: " + user.getPassword() + "\n calculated hash: " + cryptedPassword);
 		if (user.getPassword().compareTo(cryptedPassword) == 0) {
 			return user;
 		}

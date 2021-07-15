@@ -1,5 +1,9 @@
 package com.harshit.controllers;
 
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +13,9 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 import com.harshit.beans.Credentials;
 import com.harshit.beans.Email;
@@ -16,7 +23,7 @@ import com.harshit.beans.Mail;
 import com.harshit.beans.MailLog;
 import com.harshit.beans.User;
 import com.harshit.dao.UserDao;
-import com.harshit.service.CheckingMails;	
+import com.harshit.service.CheckingMails;
 import com.harshit.service.MailerAttatched;
 
 /**
@@ -99,13 +106,12 @@ public class UserController {
 	 */
 	@RequestMapping(value = "/showMailer", method = RequestMethod.GET)
 	public String showMailer(Model model) {
-		;
 		model.addAttribute("command", new Mail());
 		return "mailerForm";
 	}
 
 	/**
-	 * This fucntion creates a list of all User objects in the User Table and adds
+	 * This function creates a list of all User objects in the User Table and adds
 	 * the list to Spring model which is then accessed by the viewUser.jsp page.
 	 * 
 	 * @param model This is the model object used by SpringMVC.
@@ -224,7 +230,6 @@ public class UserController {
 		if (user != null) {
 			this.userCred = cred;
 			this.userUser = user;
-			System.out.println("HI:" + userUser.getRole());
 			if (userUser.getRole().equals("admin")) {
 				this.isUserAdmin = true;
 			} else {
@@ -311,27 +316,64 @@ public class UserController {
 		this.userCred = null;
 		return showLogin(model);
 	}
-	
-	@RequestMapping(value="/deleteLog/{id}", method=RequestMethod.GET)
+
+	@RequestMapping(value = "/deleteLog/{id}", method = RequestMethod.GET)
 	public String deleteLog(@PathVariable("id") int id, Model model) {
 		dao.deleteMailLog(id);
 		return "redirect:/showLogs";
 	}
-	
+
 	@RequestMapping("/edit/{id}")
 	public String edit(@PathVariable("id") int id, Model model) {
 		MailLog mailLog = dao.getMailLogById(id);
-		System.out.println(mailLog.getToEmail());
 		model.addAttribute("mailLog", mailLog);
 		return "viewBody";
 	}
-	
-	
-	@RequestMapping("/closeMailLog")
-	public String closeMailLog(Model model) {
-		System.out.println("HELP!");
-		return "viewMailLog";
-	}
-	
+
+	  @RequestMapping(value = "/upload", method = RequestMethod.GET)
+	  public String startUpload(Model model) {    
+	    return "uploadForm";
+	  }
+	  
+	  // Handler Method for file upload
+	  @RequestMapping(value = "/uploadFile", method = RequestMethod.POST)
+	  public String uploadFile(@RequestParam("file") MultipartFile file, Model model) {
+	    String msg= "";
+	    if(!file.isEmpty()) {
+	      BufferedOutputStream bos =null;
+	      try {
+	        byte[] fileBytes = file.getBytes();
+	        // location to save the file
+	        
+	        String path = System.getProperty("java.io.tmpdir");
+	        String newPath = "E:\\JavaProjects\\EmailSpringDB\\src\\main\\temp";
+	        
+	        String fileName = newPath+file.getOriginalFilename();
+	        
+	        System.out.println(fileName);
+	        
+	        bos = new BufferedOutputStream(new FileOutputStream(new File(fileName)));
+	        bos.write(fileBytes);
+	        msg = "Upload successful for " + file.getName();
+	      } catch (IOException e) {
+	        // TODO Auto-generated catch block
+	        e.printStackTrace();
+	      }finally {
+	        if(bos != null) {
+	          try {
+	            bos.close();
+	          } catch (IOException e) {
+	            // TODO Auto-generated catch block
+	            e.printStackTrace();
+	          }
+	        }
+	      }
+	    }else {
+	      msg = "Upload failed for " + file.getName() + " as file is empty";
+	    }
+	    model.addAttribute("message", msg);
+	    model.addAttribute("file", file);
+	    return "uploadStatus";
+	  }
 
 }

@@ -13,7 +13,7 @@
 	<a href="viewUser">View Users</a><br>
 	<a href="userForm">New Users</a><br>
 	<a href="showLogin">Login</a><br>
-	<a href="showLoginDecorated">Login Decorated</a>
+	<a href="upload">Upload Form</a>
 </div>
 </body>
 </html>

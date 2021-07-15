@@ -67,7 +67,7 @@
 					<td>${ user.getEmail() }</td>
 					<td>${ user.getPassword() }</td>
 					<td>${ user.getRole() }</td>
-					<td><a href="<c:url value='/delete/${user.id}'/>">Remove</a></td>
+					<td><a href="<c:url value='/delete/${user.id}'/>" onclick="return confirm('Are you sure you want to delete?')">Remove</a></td>
 				</tr>
 			</c:forEach>
 		</table>
