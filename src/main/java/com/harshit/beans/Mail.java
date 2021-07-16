@@ -1,5 +1,6 @@
 package com.harshit.beans;
 
+import org.springframework.web.multipart.MultipartFile;
 
 /*POJO class to store the email content
  * that is entered by the user for the MailerForm.jsp page.
@@ -13,6 +14,7 @@ public class Mail {
 	private String body;
 	private String bccEmail;
 	private String ccEmail;
+	private MultipartFile file;
 	
 	public String getBccEmail() {
 		return bccEmail;
@@ -43,6 +45,12 @@ public class Mail {
 	}
 	public void setBody(String body) {
 		this.body = body;
+	}
+	public MultipartFile getFile() {
+		return file;
+	}
+	public void setFile(MultipartFile file) {
+		this.file = file;
 	}
 	
 	

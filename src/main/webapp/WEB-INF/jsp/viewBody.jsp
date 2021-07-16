@@ -49,8 +49,8 @@
 					disabled>
 			</div>
 
-			<div class="form-group">
-				<label for="bccEmail">bcc :</label> <input type="email"
+			<div class="form-group">s
+				<label for="bccEmail">BCC :</label> <input type="email"
 					class="form-control" id="bccEmail" placeholder="Null"
 					name="bccEmail" disabled>
 			</div>

@@ -36,7 +36,7 @@
 
 	<div class="container">
 		<h1>Compose your Mail</h1>
-		<form action="mailProcess" method="post" enctype="multipart/form-data">
+		<form action="mailProcessWithAttachment" method="post" enctype="multipart/form-data">
 			<div class="form-group">
 				<label for="toEmail">Recipient's Email :</label> <input type="email"
 					class="form-control" id="toEmail" placeholder="Enter Email"
@@ -67,7 +67,7 @@
 			</div>
 			<div class="form-group">
 				<label for="attach">Add File :</label> <input type="file"
-					class="form-control" id="attachFile" name="attachFile">
+					class="form-control" id="file" name="file">
 			</div>
 
 			<input type='submit' class="btn btn-default">

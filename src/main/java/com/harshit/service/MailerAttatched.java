@@ -8,13 +8,19 @@ import javax.mail.Multipart;
 import javax.mail.Transport;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMultipart;
+
+import org.springframework.web.multipart.MultipartFile;
+
 import com.harshit.beans.Credentials;
 import com.harshit.beans.Mail;
 
 public class MailerAttatched extends Mailer {
-
+	
+	private MultipartFile file;
+	
 	public MailerAttatched(Mail mail, Credentials cred) {
 		super(mail, cred);
+		this.file = mail.getFile();
 	}
 
 	public boolean callMailerAttatch(){
@@ -25,7 +31,9 @@ public class MailerAttatched extends Mailer {
 		     
 		     MimeBodyPart messageBodyPart2 = new MimeBodyPart();  
 		     
-		     String filename = "E:/JavaProjects/EmailSpringDB/src/main/webapp/images/img1.jpeg";//change accordingly  
+			 String newPath = "E:\\JavaProjects\\EmailSpringDB\\src\\main\\temp\\";
+		     String filename = newPath + file.getOriginalFilename();//change accordingly
+		     System.out.println("FILENAME IS: " + filename);
 		     FileDataSource source = new FileDataSource(filename);  
 		     messageBodyPart2.setDataHandler(new DataHandler(source));  
 		     messageBodyPart2.setFileName(filename);  
@@ -35,7 +43,7 @@ public class MailerAttatched extends Mailer {
 		     multipart.addBodyPart(messageBodyPart1);  
 		     multipart.addBodyPart(messageBodyPart2); 
 		     
-		     message.setContent(multipart );  
+		     message.setContent(multipart);  
 		     Transport.send(message);  
 		     return true;
 		     

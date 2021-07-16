@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 import com.harshit.beans.Credentials;
 import com.harshit.beans.Email;
@@ -24,7 +23,8 @@ import com.harshit.beans.MailLog;
 import com.harshit.beans.User;
 import com.harshit.dao.UserDao;
 import com.harshit.service.CheckingMails;
-import com.harshit.service.MailerAttatched;
+import com.harshit.service.IOServices;
+import com.harshit.service.Mailer;
 
 /**
  * This class serves as the Controller for all of the requests dispatched by the
@@ -254,9 +254,8 @@ public class UserController {
 	 */
 	@RequestMapping(value = "mailProcess", method = RequestMethod.POST)
 	public String mailerProcess(@ModelAttribute("mail") Mail mail, Model model) {
-
-		MailerAttatched mailer = new MailerAttatched(mail, userCred);
-		boolean sent = mailer.callMailerAttatch();
+		Mailer mailer = new Mailer(mail, userCred);
+		boolean sent = mailer.callMailerSimple();
 		if (sent) {
 			model.addAttribute("message", "Mail Sent!");
 		} else {
@@ -264,6 +263,28 @@ public class UserController {
 		}
 		dao.addLog(mail, userCred, sent);
 		return showMailer(model);
+	}
+
+	
+	/**
+	 * This method is used to process the mail and send it using Mailer class
+	 * 
+	 * @param mail  This variable is autowired from the jsp form and contains the
+	 *              mail information
+	 * @param model This variable holds the Model object used by SpringMVC to
+	 *              contain the model
+	 * @return String This returns the same mailer page by calling showMailer
+	 */
+	@RequestMapping(value = "mailProcessWithAttachment", method = RequestMethod.POST)
+	public String mailerProcessWithAttatchment(@ModelAttribute("mail") Mail mail, Model model) {
+		Mailer mailer = new Mailer(mail, userCred);
+		boolean uploadStatus = IOServices.uploadFile(mail.getFile());
+		boolean mailStatus = mailer.callMailerSimple();
+		System.out.println("Upload Status: " + uploadStatus);
+		System.out.println("Mail Status: " + mailStatus);
+		dao.addLog(mail, userCred, mailStatus);
+		return showMailer(model);
+		
 	}
 
 	/**
@@ -282,7 +303,7 @@ public class UserController {
 	}
 
 	/**
-	 * It displays the data into form for the given id The @PathVaribale puts URL
+	 * This method displays the data into form for the given id The @PathVaribale puts URL
 	 * data into a variable
 	 * 
 	 * @param id    This variable holds the id from Users table which needs to be
@@ -330,50 +351,47 @@ public class UserController {
 		return "viewBody";
 	}
 
-	  @RequestMapping(value = "/upload", method = RequestMethod.GET)
-	  public String startUpload(Model model) {    
-	    return "uploadForm";
-	  }
-	  
-	  // Handler Method for file upload
-	  @RequestMapping(value = "/uploadFile", method = RequestMethod.POST)
-	  public String uploadFile(@RequestParam("file") MultipartFile file, Model model) {
-	    String msg= "";
-	    if(!file.isEmpty()) {
-	      BufferedOutputStream bos =null;
-	      try {
-	        byte[] fileBytes = file.getBytes();
-	        // location to save the file
-	        
-	        String path = System.getProperty("java.io.tmpdir");
-	        String newPath = "E:\\JavaProjects\\EmailSpringDB\\src\\main\\temp";
-	        
-	        String fileName = newPath+file.getOriginalFilename();
-	        
-	        System.out.println(fileName);
-	        
-	        bos = new BufferedOutputStream(new FileOutputStream(new File(fileName)));
-	        bos.write(fileBytes);
-	        msg = "Upload successful for " + file.getName();
-	      } catch (IOException e) {
-	        // TODO Auto-generated catch block
-	        e.printStackTrace();
-	      }finally {
-	        if(bos != null) {
-	          try {
-	            bos.close();
-	          } catch (IOException e) {
-	            // TODO Auto-generated catch block
-	            e.printStackTrace();
-	          }
-	        }
-	      }
-	    }else {
-	      msg = "Upload failed for " + file.getName() + " as file is empty";
-	    }
-	    model.addAttribute("message", msg);
-	    model.addAttribute("file", file);
-	    return "uploadStatus";
-	  }
+	@RequestMapping(value = "/upload", method = RequestMethod.GET)
+	public String startUpload(Model model) {
+		return "uploadForm";
+	}
+
+	// Handler Method for file upload
+	@RequestMapping(value = "/uploadFile", method = RequestMethod.POST)
+	public String uploadFile(@RequestParam("file") MultipartFile file, Model model) {
+		String msg = "";
+		if (!file.isEmpty()) {
+			BufferedOutputStream bos = null;
+			try {
+				byte[] fileBytes = file.getBytes();
+				// location to save the file
+
+				String newPath = "E:\\JavaProjects\\EmailSpringDB\\src\\main\\temp\\";
+
+				String fileName = newPath + file.getOriginalFilename();
+
+				System.out.println(fileName);
+
+				bos = new BufferedOutputStream(new FileOutputStream(new File(fileName)));
+				bos.write(fileBytes);
+				msg = "Upload successful for " + file.getName();
+			} catch (IOException e) {
+				e.printStackTrace();
+			} finally {
+				if (bos != null) {
+					try {
+						bos.close();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		} else {
+			msg = "Upload failed for " + file.getName() + " as file is empty";
+		}
+		model.addAttribute("message", msg);
+		model.addAttribute("file", file);
+		return "uploadStatus";
+	}
 
 }
