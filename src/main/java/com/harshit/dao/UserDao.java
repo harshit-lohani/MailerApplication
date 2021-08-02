@@ -7,6 +7,8 @@ import java.util.List;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.harshit.beans.Credentials;
+import com.harshit.beans.Email;
+import com.harshit.beans.EmailMapper;
 import com.harshit.beans.Mail;
 import com.harshit.beans.MailLog;
 import com.harshit.beans.MailLogMapper;
@@ -47,12 +49,46 @@ public class UserDao {
 	 *         unsuccessful
 	 */
 	public int save(User user) {
-		String sql = "insert into Users(firstName, lastName, gender, phoneNumber, email, pword) values('"
+		String sql = "insert into Users(userId, firstName, lastName, gender, phoneNumber, email, pword) values('"
+				+ user.getUserId() + "','"
 				+ user.getFirstName() + "','" + user.getLastName() + "','" + user.getGender() + "','"
 				+ user.getPhoneNumber() + "','" + user.getEmail() + "','" + CryptoService.encrypt(user.getPassword())
 				+ "')";
 
 		return template.update(sql);
+	}
+
+	/**
+	 * Returns true if there already exists a record with given userId
+	 * 
+	 * @param userId userId which is going to be checked by the database
+	 * @return boolean true if exists, false if does not exists in Users database
+	 */
+	public boolean userIdExists(String userId) {
+		String sql = "select * from Users where userId = '" + userId + "';";
+		List<User> users = template.query(sql, new UserMapper());
+
+		if (users.isEmpty()) { // no such userId exists;
+			return false;
+		} else { // such userId exists
+			return true;
+		}
+	}
+
+	public void createUser(String userId) {
+		String sql = "create table " + userId + "("
+				+ "email_uuid varchar(256) not null primary key,"
+				+ "from_email varchar(1024) not null,"
+				+ "subject varchar(1024),"
+				+ "sent_date datetime,"
+				+ "content text,"
+				+ "attachment_count int,"
+				+ "attachments varchar(225),"
+				+ "starred varchar(5) default 'false'"
+				+ ");";
+		
+		
+		template.execute(sql);
 	}
 
 	/**
@@ -114,6 +150,11 @@ public class UserDao {
 		return template.query(sql, new MailLogMapper());
 	}
 
+	public int updateProfile(int id, String file) {
+		String sql = "update Users set profile = '" + file + "' where id =" + id + ";";
+		return template.update(sql);
+	}
+
 	/**
 	 * This method runs the sql query to insert the sent mail into MailLog relation
 	 * 
@@ -149,6 +190,16 @@ public class UserDao {
 		return template.update(sql);
 	}
 
+	public int makeAdmin(String id) {
+		String sql = "update users set role = 'admin' where id = '" + id + "';";
+		return template.update(sql);
+	}
+
+	public int makeUser(String id) {
+		String sql = "update users set role = 'user' where id = '" + id + "';";
+		return template.update(sql);
+	}
+
 	/**
 	 * This methods runs the sql query to retrieve the mail log from MailLog table
 	 * corresponding to the id and return it as a MailLog object.
@@ -174,4 +225,73 @@ public class UserDao {
 		return template.update(sql);
 	}
 
+	public int updateProfile(int id, User newUser) {
+		// TODO Auto-generated method stub
+		String sql = "update users set firstname = '" + newUser.getFirstName() + "', lastname = '"
+				+ newUser.getLastName() + "', phoneNumber='" + newUser.getPhoneNumber() + "' where id = " + id + ";";
+		System.out.println(sql);
+		return template.update(sql);
+	}
+	
+	
+	public int updateInbox(String userId, List<Email> emailList) {
+		String sql = "insert IGNORE into " + userId + " ("
+				+ "email_uuid, "
+				+ "from_email, "
+				+ "subject, "
+				+ "sent_date, "
+				+ "content, "
+				+ "attachment_count, "
+				+ "attachments) "
+				+ "values";
+		
+		for(int i = 0 ; i < emailList.size() ; i++) {
+			Email email = emailList.get(i);
+			String value = "(" 
+								+ "'" + email.getEmailUUID() + "'" + ", "
+								+ "'" + email.getFromEmail() + "'" + ", "
+								+ "'" + email.getSubject()+ "'" + ", "
+								+ "'" + email.getSentDate() + "'" + ", "
+								+ "'" + email.getContent() + "'" + ", "
+								+ "" + email.getAttachmentCount() + "" + ", "
+								+ "'" + email.getAttachments() + "'"
+							+ ");";
+			
+			template.update(sql+value);
+ 		}
+			
+		return 0;			//no records to be inserted
+	}
+	
+	public List<Email> getInbox(String userId) {
+		String sql = "select * from " + userId + ";";
+		System.out.println(sql);
+		List<Email> inbox = template.query(sql, new EmailMapper());
+		return inbox;
+	}
+
+	public Email getEmailByUUID(String userId, String emailUUID) {
+		String sql = "select * from " + userId + " where email_uuid = '" + emailUUID + "';";
+		List<Email> emailList = template.query(sql, new EmailMapper());
+		return emailList.get(0);
+	}
+
+	public List<Email> searchEmail(String userId, String query) {
+		String sql = "select * from " + userId + " where subject like '%" + query + "%' or from_email like '%" + query + "%';" ;
+		List<Email> emailList = template.query(sql,  new EmailMapper());
+		return emailList;
+	}
+
+	public List<Email> getStarred(String userId) {
+		String sql = "select * from " + userId + " where starred = 'true'";
+		List<Email> emailList = template.query(sql,  new EmailMapper());
+		return emailList;
+	}
+
+	public void toggleStarred(String userId, String emailUUID) {
+		// TODO Auto-generated method stub
+		String sql = "update " + userId + " set starred = IF(starred='false', 'true', 'false')"
+				+ "where email_UUID = '" + emailUUID + "';";
+		template.update(sql);
+	}
 }

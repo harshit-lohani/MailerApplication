@@ -7,12 +7,12 @@
 <title>Insert title here</title>
 </head>
 <body>
-  <form action="uploadFile" method="post" enctype="multipart/form-data">
+  <form action="uploadFileMultiple" method="post" enctype="multipart/form-data">
     <table>
       <tr>
         <td>
           <label>Select a file to upload:</label>
-          <input type="file" name="file">
+          <input type="file" name="file" multiple="multiple">
         </td>
       </tr>
       <tr>

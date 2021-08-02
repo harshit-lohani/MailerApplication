@@ -10,10 +10,11 @@
 <link
 	href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css"
 	rel="stylesheet" id="bootstrap-css">
+<link href="<c:url value="/css/style.css" />" rel="stylesheet"></link>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body>
-	<nav class="navbar navbar-inverse">
+	<nav class="navbar navbar-default">
 		<div class="container">
 			<div class="navbar-header">
 				<a class="navbar-brand" href="#">Mailer Application</a>
@@ -49,8 +50,8 @@
 					disabled>
 			</div>
 
-			<div class="form-group">s
-				<label for="bccEmail">BCC :</label> <input type="email"
+			<div class="form-group">
+				s <label for="bccEmail">BCC :</label> <input type="email"
 					class="form-control" id="bccEmail" placeholder="Null"
 					name="bccEmail" disabled>
 			</div>
@@ -66,7 +67,7 @@
 					placeholder="No Body" name="body" disabled>${ mailLog.body }</textarea>
 			</div>
 
-			<a href="<c:url value='/showLogs'/>" class = "btn btn-default">Close</a>
+			<a href="<c:url value='/showLogs'/>" class="btn btn-default">Close</a>
 		</form>
 
 		<br>

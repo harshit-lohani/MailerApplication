@@ -12,10 +12,11 @@
 <link
 	href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css"
 	rel="stylesheet" id="bootstrap-css">
+<link href="<c:url value="/css/style.css" />" rel="stylesheet"></link>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body>
-	<nav class="navbar navbar-inverse">
+	<nav class="navbar navbar-default">
 		<div class="container">
 			<div class="navbar-header">
 				<a class="navbar-brand" href="#">Mailer Application</a>
@@ -37,10 +38,15 @@
 
 
 	<div class="container">
-		<h1>Email Logs</h1>
-		<p>Check all the mails you sent here!</p>
+		<div class="row bg-primary" style="margin: 10px 0;">
+			<div class="container" style="margin: 10px 10px;">
+				<h4>
+					<b>Mail Logs</b>
+				</h4>
+			</div>
+		</div>
 
-		<table class="table">
+		<table class="table table-hover">
 			<thead class="thead-dark">
 				<tr>
 					<th scope="col">Id#</th>
@@ -61,9 +67,15 @@
 						<td>${ maillog.toEmail }</td>
 						<td>${ maillog.subject }</td>
 						<td>${ maillog.sendTime }</td>
-						<td>${ maillog.status }</td>
+						<c:if test="${maillog.status.equals('Sent') }">
+							<td>${ maillog.status }</td>
+						</c:if>
+						<c:if test="${maillog.status.equals('Not sent') }">
+							<td class="danger">${ maillog.status }</td>
+						</c:if>
 						<td><a href="<c:url value='/edit/${maillog.id}'/>">Show</a></td>
-						<td><a href="<c:url value='/deleteLog/${maillog.id}'/>" onclick="return confirm('Are you sure you want to delete?')">Delete</a></td>
+						<td><a href="<c:url value='/deleteLog/${maillog.id}'/>"
+							onclick="return confirm('Are you sure you want to delete?')">Delete</a></td>
 					</tr>
 				</c:forEach>
 			</tbody>

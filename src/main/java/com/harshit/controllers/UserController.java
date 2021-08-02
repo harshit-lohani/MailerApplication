@@ -4,7 +4,13 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -14,6 +20,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.harshit.beans.Credentials;
@@ -139,9 +146,16 @@ public class UserController {
 	 */
 	@RequestMapping(value = "/showInbox", method = RequestMethod.GET)
 	public String showInbox(Model model) {
-		List<Email> emailList = CheckingMails.checkEmails(userCred.getUserEmail(), userCred.getPassword());
-		model.addAttribute("emailList", emailList);
-		return "inbox";
+
+		List<Email> newEmailList = CheckingMails.downloadEmails(userUser.getUserId(), userCred.getUserEmail(),
+				userCred.getPassword());
+		System.out.println("Emails recieved!");
+		dao.updateInbox(userUser.getUserId(), newEmailList);
+		System.out.println("Inbox Updated!");
+		List<Email> inbox = dao.getInbox(userUser.getUserId());
+		System.out.println("Inbox retireved!");
+		model.addAttribute("inboxList", inbox);
+		return "inboxNew";
 	}
 
 	/**
@@ -174,7 +188,14 @@ public class UserController {
 	public String showProfile(Model model) {
 		model.addAttribute("userModel", this.userUser);
 		model.addAttribute("credModel", this.userCred);
-		return "profile";
+		return "newProfile";
+	}
+
+	@RequestMapping("/showEditProfile")
+	public String showEditProfile(Model model) {
+		model.addAttribute("userModel", this.userUser);
+		model.addAttribute("credModel", this.userCred);
+		return "editProfile";
 	}
 
 	/**
@@ -265,7 +286,6 @@ public class UserController {
 		return showMailer(model);
 	}
 
-	
 	/**
 	 * This method is used to process the mail and send it using Mailer class
 	 * 
@@ -277,14 +297,17 @@ public class UserController {
 	 */
 	@RequestMapping(value = "mailProcessWithAttachment", method = RequestMethod.POST)
 	public String mailerProcessWithAttatchment(@ModelAttribute("mail") Mail mail, Model model) {
+		// create a mailer class with all relevant fields
 		Mailer mailer = new Mailer(mail, userCred);
-		boolean uploadStatus = IOServices.uploadFile(mail.getFile());
+		// try to upload the files if any
+		boolean uploadStatus = IOServices.multiUploadFile(mail.getFiles());
+		// try to send the mail with the files
 		boolean mailStatus = mailer.callMailerSimple();
 		System.out.println("Upload Status: " + uploadStatus);
 		System.out.println("Mail Status: " + mailStatus);
 		dao.addLog(mail, userCred, mailStatus);
-		return showMailer(model);
-		
+		model.addAttribute("mailStatus", mailStatus);// add status to the file
+		return showEmails(model);
 	}
 
 	/**
@@ -298,13 +321,28 @@ public class UserController {
 	 */
 	@RequestMapping(value = "/save", method = RequestMethod.POST)
 	public String save(@ModelAttribute("user") User user, Model model) {
-		dao.save(user);
-		return showLogin(model);
+		String userId = user.getUserId();
+		boolean userExists = dao.userIdExists(userId);
+
+		if (userExists) {
+			model.addAttribute("message", "UserID already exists");
+			return showLogin(model);
+		} else {
+			dao.save(user);
+			dao.createUser(userId);
+			return showLogin(model);
+		}
+	}
+
+	@RequestMapping(value = "/updateProfile", method = RequestMethod.POST)
+	public String updateProfile(@ModelAttribute("user") User user, Model model) {
+		dao.updateProfile(userUser.getId(), user);
+		return showProfile(model);
 	}
 
 	/**
-	 * This method displays the data into form for the given id The @PathVaribale puts URL
-	 * data into a variable
+	 * This method displays the data into form for the given id The @PathVaribale
+	 * puts URL data into a variable
 	 * 
 	 * @param id    This variable holds the id from Users table which needs to be
 	 *              deleted
@@ -320,6 +358,18 @@ public class UserController {
 			dao.delete(id);
 		}
 
+		return "redirect:/" + viewUser(model);
+	}
+
+	@RequestMapping(value = "/makeAdmin/{id}", method = RequestMethod.GET)
+	public String makeAdmin(@PathVariable("id") String id, Model model) {
+		dao.makeAdmin(id);
+		return "redirect:/" + viewUser(model);
+	}
+
+	@RequestMapping(value = "/makeUser/{id}", method = RequestMethod.GET)
+	public String makeUser(@PathVariable("id") String id, Model model) {
+		dao.makeUser(id);
 		return "redirect:/" + viewUser(model);
 	}
 
@@ -357,41 +407,117 @@ public class UserController {
 	}
 
 	// Handler Method for file upload
-	@RequestMapping(value = "/uploadFile", method = RequestMethod.POST)
-	public String uploadFile(@RequestParam("file") MultipartFile file, Model model) {
-		String msg = "";
-		if (!file.isEmpty()) {
-			BufferedOutputStream bos = null;
-			try {
-				byte[] fileBytes = file.getBytes();
-				// location to save the file
+	@RequestMapping(value = "/uploadProfile", method = RequestMethod.POST)
+	public String uploadFile(@RequestParam("profilePicture") MultipartFile file, Model model) {
+//		String msg = "";
 
-				String newPath = "E:\\JavaProjects\\EmailSpringDB\\src\\main\\temp\\";
-
-				String fileName = newPath + file.getOriginalFilename();
-
-				System.out.println(fileName);
-
-				bos = new BufferedOutputStream(new FileOutputStream(new File(fileName)));
-				bos.write(fileBytes);
-				msg = "Upload successful for " + file.getName();
-			} catch (IOException e) {
-				e.printStackTrace();
-			} finally {
-				if (bos != null) {
-					try {
-						bos.close();
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-				}
-			}
-		} else {
-			msg = "Upload failed for " + file.getName() + " as file is empty";
+		boolean saved = IOServices.uploadProfile(file);
+		if (saved) {
+			dao.updateProfile(userUser.getId(), file.getOriginalFilename());
+			userUser.setProfilePicture(file.getOriginalFilename());
 		}
-		model.addAttribute("message", msg);
-		model.addAttribute("file", file);
-		return "uploadStatus";
+
+		model.addAttribute("message", "profile uploaded");
+		return showProfile(model);
 	}
 
+	@RequestMapping(value = "/uploadFileMultiple", method = RequestMethod.POST)
+	@ResponseBody
+	public String uploadFile(@RequestParam("file") MultipartFile[] files, Model model) {
+		String msg = "";
+		int emptyCount = 0;
+		for (MultipartFile file : files) {
+			if (!file.isEmpty()) {
+				BufferedOutputStream bos = null;
+				try {
+					byte[] fileBytes = file.getBytes();
+					// location to save the file
+					String newPath = "E:\\JavaProjects\\EmailSpringDB\\src\\main\\temp\\";
+					String fileName = newPath + file.getOriginalFilename();
+					bos = new BufferedOutputStream(new FileOutputStream(new File(fileName)));
+					bos.write(fileBytes);
+					msg = msg + "Upload successful for " + file.getOriginalFilename() + "<br />";
+				} catch (IOException e) {
+					e.printStackTrace();
+				} finally {
+					if (bos != null) {
+						try {
+							bos.close();
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+					}
+				}
+			} else {
+				emptyCount++;
+			}
+		}
+		// Equal means no file is selected for upload
+		if (files.length == emptyCount) {
+			msg = "Upload failed as no file is selected";
+		}
+		return msg;
+	}
+
+	@RequestMapping("/readEmail/{emailUUID}")
+	public String readEmail(@PathVariable("emailUUID") String emailUUID, Model model) {
+
+		Email email = dao.getEmailByUUID(userUser.getUserId(), emailUUID);
+		System.out.println(email.getSubject());
+		model.addAttribute("email", email);
+		return "readEmailNew";
+	}
+
+	@RequestMapping("/searchEmail")
+	public String searchEmail(@RequestParam("searchString") String query, Model model) {
+		List<Email> emailList = dao.searchEmail(userUser.getUserId(), query);
+		model.addAttribute("inboxList", emailList);
+		return "inboxNew";
+	}
+
+	@RequestMapping("/showStarred")
+	public String showStarred(Model model) {
+		List<Email> emailList = dao.getStarred(userUser.getUserId());
+		model.addAttribute("inboxList", emailList);
+		return "inboxNew";
+	}
+
+	@RequestMapping("/showEmails")
+	public String showEmails(Model model){
+		List<Email> emailList = dao.getInbox(userUser.getUserId());
+		model.addAttribute("inboxList", emailList);
+		return "inboxNew";
+	}
+
+	@RequestMapping(value = "/download/{filename:.+}", method = RequestMethod.GET)
+    public void downloadPDFResource( HttpServletRequest request, HttpServletResponse response, @PathVariable("filename") String fileName) {
+        String dataDirectory = "E:\\JavaProjects\\EmailSpringDB\\src\\main\\temp\\Attachments\\";
+        Path file = Paths.get(dataDirectory, fileName);
+        System.out.println(fileName);
+        System.out.println(file);
+        System.out.println(dataDirectory);
+        if (Files.exists(file)) 
+        {
+//            response.setContentType("");
+            response.addHeader("Content-Disposition", "attachment; filename="+fileName);
+            try
+            {
+                Files.copy(file, response.getOutputStream());
+                response.getOutputStream().flush();
+            } 
+            catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+        else {
+        	System.out.println("File not find!");
+        }
+	}
+	
+	@RequestMapping("/toggleStarred/{emailUUID}")
+	public String toggleStarred(Model model, @PathVariable("emailUUID") String emailUUID) {
+		dao.toggleStarred(userUser.getUserId(), emailUUID);
+		return readEmail(emailUUID, model);
+	}
+		
 }

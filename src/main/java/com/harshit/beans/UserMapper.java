@@ -21,16 +21,15 @@ public class UserMapper implements RowMapper<User>{
         User e=new User();    
         
         e.setId(rs.getInt(1));    
-        e.setFirstName(rs.getString(2));
-        e.setLastName(rs.getString(3));
-        e.setGender(rs.getString(4));
-        e.setPhoneNumber(rs.getString(5));
-        e.setEmail(rs.getString(6));
-        e.setPassword(rs.getString(7));
-        e.setRole(rs.getString(9));
-        
-        System.out.println(rs.getString(9));
-        
+        e.setUserId(rs.getString(2));
+        e.setFirstName(rs.getString(3));
+        e.setLastName(rs.getString(4));
+        e.setGender(rs.getString(5));
+        e.setPhoneNumber(rs.getString(6));
+        e.setEmail(rs.getString(7));
+        e.setPassword(rs.getString(8));
+        e.setRole(rs.getString(10));
+        e.setProfilePicture(rs.getString(11));        
         return e;
         
 	}

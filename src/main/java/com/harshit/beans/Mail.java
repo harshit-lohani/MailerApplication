@@ -14,8 +14,10 @@ public class Mail {
 	private String body;
 	private String bccEmail;
 	private String ccEmail;
-	private MultipartFile file;
+	private MultipartFile[] files;
+	private boolean encrypted;
 	
+
 	public String getBccEmail() {
 		return bccEmail;
 	}
@@ -46,13 +48,18 @@ public class Mail {
 	public void setBody(String body) {
 		this.body = body;
 	}
-	public MultipartFile getFile() {
-		return file;
+	public MultipartFile[] getFiles() {
+		return files;
 	}
-	public void setFile(MultipartFile file) {
-		this.file = file;
+	public void setFiles(MultipartFile[] files) {
+		this.files = files;
 	}
-	
-	
+	public boolean isEncrypted() {
+		return encrypted;
+	}
+	public void setEncrypted(boolean encrypted) {
+		this.encrypted = encrypted;
+	}
+
 	
 }

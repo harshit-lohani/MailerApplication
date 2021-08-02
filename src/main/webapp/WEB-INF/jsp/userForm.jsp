@@ -76,7 +76,13 @@
 					<form:input path="phoneNumber" class="form-control"
 						placeholder="Phone Number" />
 				</div>
-
+				
+				<div class="form-group col-sm-12">
+					<label class="control-label" for="userId">User ID</label>
+					<form:input path="userId" class="form-control" type="text"
+						placeholder="User ID" required="true"/>
+				</div>
+				
 				<div class="form-group col-sm-12">
 					<label class="control-label" for="email">Email</label>
 					<form:input path="email" class="form-control" type="email"

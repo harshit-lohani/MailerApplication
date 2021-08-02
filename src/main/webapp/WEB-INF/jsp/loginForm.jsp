@@ -46,25 +46,26 @@
 		</div>
 
 		<div class="container col-sm-6" id="form-container">
-			<div class="container col-sm-12" style="margin:15px 0">
+			<div class="container col-sm-12" style="margin: 15px 0">
 				<h2>LOGIN</h2>
 			</div>
 			<form:form method="post" action="userLogin" style="margin-top: 50px;">
 				<div class="form-group col-sm-12">
 					<label for="email">Email ID :</label>
 					<form:input path="userEmail" type="email" class="form-control"
-						id="userEmail" placeholder="Enter Email" name="userEmail" required="true"/>
+						id="userEmail" placeholder="Enter Email" name="userEmail"
+						required="true" />
 				</div>
 
 				<div class="form-group col-sm-12">
 					<label for="password">Password :</label>
 					<form:input path="password" type="password" class="form-control"
-						placeholder="Enter Password" required="true"/>
+						placeholder="Enter Password" required="true" />
 				</div>
 
 				<div class="form-group col-sm-12">
 					<input type="submit" value="LOGIN"
-						class="btn btn-primary btn-lg col-sm-12" style="margin: 15px 0"/>
+						class="btn btn-primary btn-lg col-sm-12" style="margin: 15px 0" />
 				</div>
 
 				<div class="container col-sm-12">

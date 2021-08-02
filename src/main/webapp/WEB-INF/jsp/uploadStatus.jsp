@@ -11,15 +11,15 @@
   <tr>
     <td>Upload status: ${message}</td>
   </tr>
-  <tr>
-    <td>File Name: ${file.getOriginalFilename()}</td>
-  </tr>
-  <tr>
-    <td>File Size: ${file.getSize()}</td>
-  </tr>
-  <tr>
-    <td>File Type: ${file.getContentType()}</td>
-  </tr>
+<!--   <tr> -->
+<%--     <td>File Name: ${file.getOriginalFilename()}</td> --%>
+<!--   </tr> -->
+<!--   <tr> -->
+<%--     <td>File Size: ${file.getSize()}</td> --%>
+<!--   </tr> -->
+<!--   <tr> -->
+<%--     <td>File Type: ${file.getContentType()}</td> --%>
+<!--   </tr> -->
 </table>
 </body>
 </html> 

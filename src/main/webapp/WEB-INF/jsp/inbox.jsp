@@ -11,11 +11,12 @@
 <link
 	href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css"
 	rel="stylesheet" id="bootstrap-css">
+<link href="<c:url value="/css/style.css" />" rel="stylesheet"></link>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body>
 
-	<nav class="navbar navbar-inverse">
+	<nav class="navbar navbar-default">
 		<div class="container">
 			<div class="navbar-header">
 				<a class="navbar-brand" href="#">Mailer Application</a>
@@ -34,30 +35,58 @@
 			</ul>
 		</div>
 	</nav>
-	
-	<div class = "container">
 
-	<table class="table">
-		<thead class="thead-dark">
-			<tr>
-				<th scope="row">Email Number</th>
-				<th scope="row">From</th>
-				<th scope="row">Subject</th>
-				<th scope="row">Content</th>
-				
-			</tr>
-		</thead>
+	<div class="container">
 
-		<c:forEach var="email" items="${emailList}">
-			<tr>
-				<td>${ email.emailNumber}</td>
-				<td>${ email.from }</td>
-				<td>${ email.subject }</td>
-				<td>${ email.content }</td>
-			</tr>
-		</c:forEach>
-	</table>
-	
+		<div class="container" style="margin: 0px;">
+			<div class="container col-sm-12 bg-primary" style="padding: 10px;">
+				<h4>
+					<b>Primary Inbox</b>
+				</h4>
+			</div>
+		</div>
+
+		<div class="container">
+			<table class="table table-hover" style="margin-top: 50px;">
+				<tr class="info">
+					<td>
+						<div class="container">
+							<div class="conatiner col-sm-3" id="mailSubject"
+								style="overflow: hidden;">
+								<b>From</b>
+							</div>
+							<div class="container-fluid" id="mailSubject">
+								<p>
+									<b>Subject</b>
+								</p>
+							</div>
+						</div>
+					</td>
+				</tr>
+
+				<c:forEach var="email" items="${inboxList}">
+					<tr>
+						<td>
+							<div class="container">
+								<div class="col-sm-3" id="mailSubject" style="overflow: hidden;">
+									<b>${email.fromEmail}</b>
+								</div>
+								<div class="container-fluid" id="mailSubject">
+									<p>
+										<b>${email.subject}</b> -${email.content}
+									</p>
+								</div>
+								<div>
+									${email.sentDate}
+									${email.attachments}
+								</div>
+							</div>
+						</td>
+					</tr>
+				</c:forEach>
+			</table>
+		</div>
+
 	</div>
 </body>
 </html>

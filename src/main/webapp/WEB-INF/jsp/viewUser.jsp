@@ -14,11 +14,12 @@
 <link
 	href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css"
 	rel="stylesheet" id="bootstrap-css">
+<link href="<c:url value="/css/style.css" />" rel="stylesheet"></link>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body>
 
-	<nav class="navbar navbar-inverse">
+	<nav class="navbar navbar-default">
 		<div class="container">
 			<div class="navbar-header">
 				<a class="navbar-brand" href="#">Mailer Application</a>
@@ -40,9 +41,14 @@
 
 
 	<div class="container">
-		<h1>View Users</h1>
-		<p>Show all users that are available!</p>
-		<table class="table">
+		<div class="row bg-primary" style="margin: 10px 0;">
+			<div class="container" style="margin: 10px 10px;">
+				<h4>
+					<b>View Users</b>
+				</h4>
+			</div>
+		</div>
+		<table class="table" style="margin-top: 10px;">
 			<thead class="thead-dark">
 				<tr>
 					<th scope="row">Id</th>
@@ -53,7 +59,8 @@
 					<th scope="row">Email</th>
 					<th scope="row">Password</th>
 					<th scope="row">Role</th>
-					<th scope="row">Remove<br></th>
+					<th scope="row">Remove</th>
+					<th scope="row">Change Role</th>
 				</tr>
 			</thead>
 
@@ -66,14 +73,29 @@
 					<td>${ user.getPhoneNumber() }</td>
 					<td>${ user.getEmail() }</td>
 					<td>${ user.getPassword() }</td>
-					<td>${ user.getRole() }</td>
-					<td><a href="<c:url value='/delete/${user.id}'/>" onclick="return confirm('Are you sure you want to delete?')">Remove</a></td>
+					
+					<c:if test="${user.role.equals('user')}">
+						<td>User</td>
+					</c:if>
+					<c:if test="${user.role.equals('admin')}">
+						<td class="success">Admin</td>
+					</c:if>
+					
+					<td><a href="<c:url value='/delete/${user.id}'/>"
+						onclick="return confirm('Are you sure you want to delete?')">Remove</a></td>
+					
+					<c:if test="${user.role.equals('user')}">
+					<td class ="gray"><a href="<c:url value='/makeAdmin/${user.id}'/>"
+						onclick="return confirm('Are you sure you want to change role?')">Make Admin</a></td>
+					</c:if>
+					<c:if test="${user.role.equals('admin')}">
+					<td><a href="<c:url value='/makeUser/${user.id}'/>"
+						onclick="return confirm('Are you sure you want to change role?')">Make user</a></td>
+					</c:if>
 				</tr>
 			</c:forEach>
 		</table>
-		<br />
-		
-		${message}
+		<br /> ${message}
 	</div>
 </body>
 </html>

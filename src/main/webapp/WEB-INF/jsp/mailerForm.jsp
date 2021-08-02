@@ -10,10 +10,11 @@
 <link
 	href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css"
 	rel="stylesheet" id="bootstrap-css">
+<link href="<c:url value="/css/style.css" />" rel="stylesheet"></link>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body>
-	<nav class="navbar navbar-inverse">
+	<nav class="navbar navbar-default">
 		<div class="container">
 			<div class="navbar-header">
 				<a class="navbar-brand" href="#">Mailer Application</a>
@@ -35,24 +36,31 @@
 
 
 	<div class="container">
-		<h1>Compose your Mail</h1>
-		<form action="mailProcessWithAttachment" method="post" enctype="multipart/form-data">
-			<div class="form-group">
-				<label for="toEmail">Recipient's Email :</label> <input type="email"
-					class="form-control" id="toEmail" placeholder="Enter Email"
-					name="toEmail">
+		<div class="row bg-primary" style="margin: 0; margin-bottom: 30px;">
+			<div class="container" style="margin: 10px 10px;">
+				<h4>
+					<b>Compose Mail</b>
+				</h4>
 			</div>
+		</div>
+		<form action="mailProcessWithAttachment" method="post"
+			enctype="multipart/form-data">
+			<label for="recipients">Recipients :</label>
+			<div class="recipients" style="margin-bottom: 15px;">
+				<div class="input-group">
+					<span class="input-group-addon">TO:</span> <input type="email"
+						class="form-control" id="toEmail" name="toEmail">
+				</div>
 
-			<div class="form-group">
-				<label for="ccEmail">CC :</label> <input type="email"
-					class="form-control" id="ccEmail" placeholder="Enter Email"
-					name="ccEmail">
-			</div>
+				<div class="input-group">
+					<span class="input-group-addon">CC:</span> <input type="email"
+						class="form-control" id="ccEmail" name="ccEmail">
+				</div>
 
-			<div class="form-group">
-				<label for="bccEmail">bcc :</label> <input type="email"
-					class="form-control" id="bccEmail" placeholder="Enter Email"
-					name="bccEmail">
+				<div class="input-group">
+					<span class="input-group-addon">BCC</span> <input type="email"
+						class="form-control" id="bccEmail" name="bccEmail">
+				</div>
 			</div>
 
 			<div class="form-group">
@@ -60,23 +68,39 @@
 					class="form-control" id="subject" placeholder="Enter Subject"
 					name="subject">
 			</div>
+
 			<div class="form-group">
 				<label for="body">Body :</label>
 				<textarea class="form-control form-control" rows="10" id="body"
 					placeholder="Enter Body" name="body"></textarea>
 			</div>
 			<div class="form-group">
-				<label for="attach">Add File :</label> <input type="file"
-					class="form-control" id="file" name="file">
+
+				<input type='submit' class="btn btn-primary col-sm-1" value="SEND">
+
+				<label for="files" class="btn btn-success" style="margin: 0 20px;"> Attach Files </label> <input
+					type="file" class="form-control-file col-sm-3" id="files"
+					name="files" multiple="multiple" value="Atach"
+					style="opacity: 0; position: absolute; z-index: -1;" />
 			</div>
-
-			<input type='submit' class="btn btn-default">
-
+			<div class="form-group">
+				<label for="encrypted">Encrypt :</label>
+				<input type="checkbox" name="encrypted" id="encrypted">
+			</div>
 		</form>
-
 		<br>
-
-		<h3>${ message }</h3>
+		<c:if test="${not empty mailStatus}">
+			<c:if test="${mailStatus}">
+				<script>
+					alert("Mail Sent!");
+				</script>
+			</c:if>
+			<c:if test="${!mailStatus}">
+				<script>
+					alert("Mail not sent!");
+				</script>
+			</c:if>
+		</c:if>
 	</div>
 </body>
 </html>

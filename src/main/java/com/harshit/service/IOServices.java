@@ -1,53 +1,75 @@
 package com.harshit.service;
 
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 
 import org.springframework.web.multipart.MultipartFile;
 
 public class IOServices {
-	public static boolean uploadFile(MultipartFile file) {
 
+	private static String storagePath = "E:\\JavaProjects\\EmailSpringDB\\src\\main\\temp\\";
+	private static String profilePath = "E:\\JavaProjects\\EmailSpringDB\\src\\main\\webapp\\images\\profile\\";
+//	private static String profilePath2 = "E:\\JavaProjects\\EmailSpringDB\\src\\main\\temp\\profile\\";
+	
+
+	public static String uploadFile(MultipartFile file) {
+		
 		System.out.println(file.getContentType());
 
-		if (!file.isEmpty()) {
-			BufferedOutputStream bos = null;
-			try {
-				byte[] fileBytes = file.getBytes();
-				// location to save the file
+		if (file.isEmpty()) {
+			return "EMPTY_FILE";
+		}
 
-//				String path = System.getProperty("java.io.tmpdir");
-				String newPath = "E:\\JavaProjects\\EmailSpringDB\\src\\main\\temp\\";
+		try {
+			String fileName = storagePath + file.getOriginalFilename();
+			file.transferTo(new File(fileName));
+			return "SUCCESS";
+		} catch (IOException e) {
+			e.printStackTrace();
+			return "IO_EXCEPTION";
+		}
+	}
 
-				String fileName = newPath + file.getOriginalFilename();
+	public static boolean multiUploadFile(MultipartFile[] files) {
 
-				System.out.println("Controller file name is" + fileName);
-
-				bos = new BufferedOutputStream(new FileOutputStream(new File(fileName)));
-				bos.write(fileBytes);
-				return true;
+		if (null != files && files.length > 0) {
+			for (MultipartFile file : files) {
 				
-			} catch (IOException e) {
-				
-				e.printStackTrace();
-				
-			} finally {
-				
-				if (bos != null) {
-					try {
-						bos.close();
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
+				if(file.isEmpty()) {
+					continue;
 				}
 				
+				String fileName = storagePath + file.getOriginalFilename();
+				try {
+					file.transferTo(new File(fileName));
+				} catch (IOException e) {
+					e.printStackTrace();
+					return false;
+				}
 			}
-		} else {
+			return true;
+		}
+		else {
+			System.out.println("No Files found on path!");
+			return true;
+		}
+	}
+	
+	
+	public static boolean uploadProfile(MultipartFile file) {
+		
+		if (file.isEmpty()) {
 			return false;
 		}
-		return false;
+
+		try {
+			String fileName = profilePath + file.getOriginalFilename();
+			file.transferTo(new File(fileName));
+			return true;
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}
 	}
 
 }

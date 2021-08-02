@@ -9,6 +9,7 @@ package com.harshit.beans;
 
 public class User {
 	private int id;
+	private String userId;
 	private String firstName;
 	private String lastName;
 	private String gender;
@@ -16,11 +17,17 @@ public class User {
 	private String email;						//user's Gmail address
 	private String password;					//user's Gmail password encrypted by blowfish
 	private String role;
+	private String profilePicture;
 	
 	
-	
-	
-	
+	public String getProfilePicture() {
+		return profilePicture;
+	}
+
+	public void setProfilePicture(String profilePicture) {
+		this.profilePicture = profilePicture;
+	}
+
 	public String getRole() {
 		return role;
 	}
@@ -83,6 +90,14 @@ public class User {
 
 	public void setId(int id) {
 		this.id = id;
+	}
+
+	public String getUserId() {
+		return userId;
+	}
+
+	public void setUserId(String userId) {
+		this.userId = userId;
 	}
 	
 	

@@ -24,7 +24,8 @@ public class Mailer {
 	private String ccEmail;
 	private String subject;
 	private String body;
-	private MultipartFile file;
+	private MultipartFile[] files;
+	private boolean encrypted;
 
 	private static final String HOSTNAME = "mail.smtp.host";
 	private static final String SOCKETFACTORYPORT = "mail.smtp.socketFactoryPort";
@@ -49,7 +50,8 @@ public class Mailer {
 		this.body = mail.getBody();
 		this.bccEmail = mail.getBccEmail();
 		this.ccEmail = mail.getCcEmail();
-		this.file = mail.getFile();
+		this.files = mail.getFiles();
+		this.encrypted = mail.isEncrypted();
 	}
 
 	/*
@@ -93,10 +95,25 @@ public class Mailer {
 		Message message = new MimeMessage(session);
 		message.setFrom(new InternetAddress(from));
 		message.setRecipient(Message.RecipientType.TO, new InternetAddress(toEmail));
-//        if(bccEmail != "" && bccEmail != null)
-//        	message.setRecipient(Message.RecipientType.BCC, new InternetAddress(bccEmail));
-//        if(ccEmail != "" && ccEmail != null)
-//        	message.setRecipient(Message.RecipientType.CC, new InternetAddress(ccEmail));
+		try {
+			InternetAddress bcc = new InternetAddress(bccEmail);
+			message.setRecipient(Message.RecipientType.BCC, bcc);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		try {
+			InternetAddress cc = new InternetAddress(bccEmail);
+			message.setRecipient(Message.RecipientType.CC, cc);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		if(encrypted) {
+			subjectText = "[ENC]" + MailEncryptor.caesarCipherEncrypt(subjectText);
+			System.out.println(subjectText);
+			body = MailEncryptor.caesarCipherEncrypt(body);
+		}
+		
 		message.setSubject(subjectText);
 		message.setText(body);
 		return message;
@@ -164,7 +181,7 @@ public class Mailer {
 			return false;
 		}
 	}
-	
+
 //	public BodyPart getAttachment(MultipartFile file) throws Exception{
 //		String newPath = "E:\\JavaProjects\\EmailSpringDB\\src\\main\\temp\\";
 //		BodyPart attachment = new MimeBodyPart();
@@ -179,10 +196,14 @@ public class Mailer {
 
 		try {
 			Message message = this.getMessage();
-			
+
 			String newPath = "E:\\JavaProjects\\EmailSpringDB\\src\\main\\temp\\";
-			
-			if (!this.file.isEmpty()) {
+			Multipart multipart = new MimeMultipart();
+			for (MultipartFile file : this.files) {
+
+				if (file.isEmpty()) {
+					continue;
+				}
 				BodyPart attachment = new MimeBodyPart();
 				String filename = newPath + file.getOriginalFilename();// change accordingly
 				System.out.println("FILENAME IS: " + filename);
@@ -190,17 +211,16 @@ public class Mailer {
 				attachment.setDataHandler(new DataHandler(source));
 				attachment.setFileName(filename);
 
-				Multipart multipart = new MimeMultipart();
 				multipart.addBodyPart(attachment);
-
-				message.setContent(multipart);
 			}
-			
-			
+			if (multipart.getCount() != 0)
+				message.setContent(multipart);
 			Transport.send(message);
 			return true;
-			
-		} catch (Exception e) {
+		} catch (
+
+		Exception e) {
+			e.printStackTrace();
 			return false;
 		}
 	}
@@ -212,7 +232,7 @@ public class Mailer {
 
 			String newPath = "E:\\JavaProjects\\EmailSpringDB\\src\\main\\temp\\";
 
-			String filename = newPath + file.getOriginalFilename();// change accordingly
+			String filename = newPath + files[0].getOriginalFilename();// change accordingly
 			System.out.println("FILENAME IS: " + filename);
 			FileDataSource source = new FileDataSource(filename);
 			attachment.setDataHandler(new DataHandler(source));

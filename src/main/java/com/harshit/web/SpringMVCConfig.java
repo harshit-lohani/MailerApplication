@@ -1,10 +1,13 @@
 package com.harshit.web;
 
+import java.util.concurrent.TimeUnit;
+
 import javax.sql.DataSource;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.CacheControl;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
@@ -31,8 +34,10 @@ public class SpringMVCConfig implements WebMvcConfigurer {
 	}
 
 	public void addResourceHandlers(final ResourceHandlerRegistry registry) {
-		registry.addResourceHandler("/css/**").addResourceLocations("/css/");
-		registry.addResourceHandler("/images/**").addResourceLocations("/images/");
+		registry.addResourceHandler("/css/**").addResourceLocations("/css/")
+				.setCacheControl(CacheControl.maxAge(30, TimeUnit.SECONDS));
+		registry.addResourceHandler("/images/**").addResourceLocations("/images/")
+				.setCacheControl(CacheControl.maxAge(30, TimeUnit.SECONDS));
 	}
 
 	@Bean("ds")
